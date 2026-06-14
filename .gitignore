@@ -3,6 +3,9 @@
 .AppleDouble
 .LSOverride
 
+# Text files
+*.txt
+
 # Unity generated
 [Ll]ibrary/
 [Tt]emp/
@@ -39,9 +42,6 @@ ExportedObj/
 *.pidb.meta
 *.pdb.meta
 *.mdb.meta
-
-# Unity3D generated file on crash reports
-sysinfo.txt
 
 # Builds
 *.apk
