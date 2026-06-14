@@ -9,7 +9,7 @@ Unity 2022.3 LTS で開発するお小遣い管理アプリです。
 ## プロジェクト構成
 
 ```
-PocketMoneyMonager/PocketMoneyManager/   # Unity プロジェクトルート
+PocketMoneyMonager/   # Unity プロジェクトルート
 ├── Assets/
 ├── Packages/
 └── ProjectSettings/
@@ -18,4 +18,4 @@ PocketMoneyMonager/PocketMoneyManager/   # Unity プロジェクトルート
 ## セットアップ
 
 1. [Unity Hub](https://unity.com/download) から Unity 2022.3.62f1 をインストール
-2. Unity Hub で `PocketMoneyMonager/PocketMoneyManager` を開く
+2. Unity Hub で `PocketMoneyMonager` を開く
