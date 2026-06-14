@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary> サンプルボタンのView </summary>
-public class SampleButtonView : MonoBehaviour
+/// <summary> メインView </summary>
+public class MainView : MonoBehaviour
 {
     [SerializeField] Button _button;
 
