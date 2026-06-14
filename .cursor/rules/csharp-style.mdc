@@ -1,0 +1,79 @@
+---
+description: C# の基本コーディングスタイル。基本フォーマットは .editorconfig に従う。
+globs:
+  - "**/*.cs"
+alwaysApply: true
+---
+
+# C# コーディングスタイル
+
+基本のフォーマット（インデント、改行コード、命名スタイルの一部）は `.editorconfig` に従ってください。
+詳細な規約についてはリポジトリルート（`Client/` の親ディレクトリ）にある `README.md` も参照してください。
+
+## ブレース（最重要）
+
+if / else / for / foreach / while のブレース `{}` 省略は **1行で完結する場合のみ**。
+else も 1行省略するなら if / else ともに省略し、ブレースを付けるなら両方に付ける。
+**迷ったらブレースを付ける。**
+
+```csharp
+// OK
+if (x == null) return;
+foreach (var item in itemList) DoSomething(item);
+
+// OK
+if (x == null)
+{
+    return;
+}
+
+// OK
+if (x == null) DoSomething();
+else DoElse();
+
+// NG: 改行してブレース省略は禁止
+if (x == null)
+    return;
+
+// NG: if-else 内でブレース省略と非省略の混在は禁止
+if (x == null) DoSomething();
+else
+{
+    DoElse();
+}
+```
+
+## コレクションの命名（最重要）
+
+**`List<T>` を英語の複数形 (`~s`) で命名してはいけない。** 必ず末尾に型名を付ける。
+
+| 型 | 命名規則 | OK例 | NG例 |
+|---|---|---|---|
+| `T[]` / `IEnumerable<T>` | 英語の複数形 | `_characterIds` | `_characterIdList` |
+| `List<T>` | 末尾に `List` | `_characterIdList` | `_characterIds` |
+| `Queue<T>` | 末尾に `Queue` | `_characterIdQueue` | `_characterIds` |
+| `Stack<T>` | 末尾に `Stack` | `_characterIdStack` | `_characterIds` |
+| `Dictionary<K,V>` | 末尾に `Dict` | `_characterNameDict` | `_characterNames` |
+
+## その他の基本ルール
+- **アクセス修飾子**: private で省略可能でも必ず付ける。
+- **コメント**: 行頭に `//` + 半角スペース1つ。行末コメントは使用しない。
+- **XMLコメント**: public クラス/メソッド/プロパティ/フィールドに付与（自明な場合を除く）。
+- **`var`**: 型が明確な場合のみ使用。
+- **空文字**: `""` ではなく `string.Empty` を使用。
+- **改行**: 連続する空行は最大1行まで。
+
+## 命名規則
+- **IEnumerable / 配列**: 英語の複数形。
+- **属性型**: `Attribute` で終える。
+- **列挙型**: 単数形（Flags は複数形）。
+- **頭字語（略語）**:
+    - 2文字: 全て大文字（例: `UI`, `IO`）。
+    - 3文字以上: 頭文字のみ大文字（例: `Bpm`, `Xml`, `Api`）。
+
+## プロパティ
+- 可能な限り自動プロパティを使用。
+- private プロパティは PascalCase。
+
+## namespace
+
