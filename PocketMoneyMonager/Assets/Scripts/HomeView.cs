@@ -26,7 +26,7 @@ public class HomeView : MonoBehaviour
 
     /// <summary> 所持金表示を更新する </summary>
     public void SetBalance(int balance) =>
-        _balanceText.text = $"今月のおこづかいは残り {CurrencyFormatter.Format(balance)}円 です";
+        _balanceText.text = $"{CurrencyFormatter.Format(balance)}円";
 
     /// <summary> 初期化処理 </summary>
     void Start()
