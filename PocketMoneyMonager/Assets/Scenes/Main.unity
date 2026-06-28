@@ -5282,7 +5282,7 @@ GameObject:
   - component: {fileID: 1644550650}
   - component: {fileID: 1644550649}
   m_Layer: 0
-  m_Name: RemainingText
+  m_Name: BalanceText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
