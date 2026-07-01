@@ -11,6 +11,7 @@ public static class HomeSceneSetup
 {
     const string ScenePath = "Assets/Scenes/Main.unity";
     const string FontAssetPath = "Assets/TextMesh Pro/Resources/Fonts & Materials/NotoSansJP SDF.asset";
+    const string SelectedTabSpritePath = "Assets/Images/Sprites/btn_square_main.png";
 
     /// <summary> コンパイル後に未セットアップなら自動構築する </summary>
     static HomeSceneSetup() => EditorApplication.delayCall += TryAutoSetup;
@@ -227,10 +228,26 @@ public static class HomeSceneSetup
 
         var monthlyTabButton = CreateButton(panel.transform, "MonthlyTabButton", "月間", new Vector2(-120f, 120f), fontAsset);
         var weeklyTabButton = CreateButton(panel.transform, "WeeklyTabButton", "週間", new Vector2(120f, 120f), fontAsset);
+        var monthlyTabImage = monthlyTabButton.GetComponent<Image>();
+        var weeklyTabImage = weeklyTabButton.GetComponent<Image>();
+        var monthlyTabText = monthlyTabButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        var weeklyTabText = weeklyTabButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        var selectedTabSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SelectedTabSpritePath);
         var totalText = CreatePopupLabel(panel.transform, "TotalText", "0円", new Vector2(0f, 0f), 48f, fontAsset, Color.black);
         var closeButton = CreateButton(panel.transform, "CloseButton", "閉じる", new Vector2(0f, -200f), fontAsset);
 
-        SetExpenseSummaryPopupReferences(popupView, panel, monthlyTabButton, weeklyTabButton, totalText, closeButton);
+        SetExpenseSummaryPopupReferences(
+            popupView,
+            panel,
+            monthlyTabButton,
+            weeklyTabButton,
+            monthlyTabImage,
+            weeklyTabImage,
+            monthlyTabText,
+            weeklyTabText,
+            selectedTabSprite,
+            totalText,
+            closeButton);
         panel.SetActive(false);
         return popupView;
     }
@@ -528,12 +545,28 @@ public static class HomeSceneSetup
     }
 
     /// <summary> ExpenseSummaryPopupViewの参照を設定する </summary>
-    static void SetExpenseSummaryPopupReferences(ExpenseSummaryPopupView popupView, GameObject root, Button monthlyTabButton, Button weeklyTabButton, TextMeshProUGUI totalText, Button closeButton)
+    static void SetExpenseSummaryPopupReferences(
+        ExpenseSummaryPopupView popupView,
+        GameObject root,
+        Button monthlyTabButton,
+        Button weeklyTabButton,
+        Image monthlyTabImage,
+        Image weeklyTabImage,
+        TextMeshProUGUI monthlyTabText,
+        TextMeshProUGUI weeklyTabText,
+        Sprite selectedTabSprite,
+        TextMeshProUGUI totalText,
+        Button closeButton)
     {
         var serializedObject = new SerializedObject(popupView);
         serializedObject.FindProperty("_root").objectReferenceValue = root;
         serializedObject.FindProperty("_monthlyTabButton").objectReferenceValue = monthlyTabButton;
         serializedObject.FindProperty("_weeklyTabButton").objectReferenceValue = weeklyTabButton;
+        serializedObject.FindProperty("_monthlyTabImage").objectReferenceValue = monthlyTabImage;
+        serializedObject.FindProperty("_weeklyTabImage").objectReferenceValue = weeklyTabImage;
+        serializedObject.FindProperty("_monthlyTabText").objectReferenceValue = monthlyTabText;
+        serializedObject.FindProperty("_weeklyTabText").objectReferenceValue = weeklyTabText;
+        serializedObject.FindProperty("_selectedTabSprite").objectReferenceValue = selectedTabSprite;
         serializedObject.FindProperty("_totalText").objectReferenceValue = totalText;
         serializedObject.FindProperty("_closeButton").objectReferenceValue = closeButton;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
