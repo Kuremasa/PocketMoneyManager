@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] ExpenseInputPopupView _expenseInputPopup;
     [SerializeField] ExpenseSummaryPopupView _expenseSummaryPopup;
     [SerializeField] HistoryPopupView _historyPopup;
+    [SerializeField] SimplePopupView _simplePopup;
 
     /// <summary> コンフィグボタンクリック時 </summary>
     public event Action ConfigButtonClicked;
@@ -74,6 +75,51 @@ public class UIManager : MonoBehaviour
 
     /// <summary> 履歴ポップアップを非表示にする </summary>
     public void HideHistoryPopup() => _historyPopup.Hide();
+
+    /// <summary> 2ボタンタイプの簡易ポップアップを表示する </summary>
+    public void ShowSimplePopupTwoButton(string message, string okText, string cancelText, Action<bool> onClosed)
+    {
+        void OnOk()
+        {
+            Unsubscribe();
+            onClosed?.Invoke(true);
+            HideSimplePopup();
+        }
+
+        void OnCancel()
+        {
+            Unsubscribe();
+            onClosed?.Invoke(false);
+            HideSimplePopup();
+        }
+
+        void Unsubscribe()
+        {
+            _simplePopup.OkClicked -= OnOk;
+            _simplePopup.CancelClicked -= OnCancel;
+        }
+
+        _simplePopup.OkClicked += OnOk;
+        _simplePopup.CancelClicked += OnCancel;
+        _simplePopup.ShowTwoButton(message, okText, cancelText);
+    }
+
+    /// <summary> 1ボタンタイプの簡易ポップアップを表示する </summary>
+    public void ShowSimplePopupOneButton(string message, string okText, Action onClosed = null)
+    {
+        void OnOk()
+        {
+            _simplePopup.OkClicked -= OnOk;
+            onClosed?.Invoke();
+            HideSimplePopup();
+        }
+
+        _simplePopup.OkClicked += OnOk;
+        _simplePopup.ShowOneButton(message, okText);
+    }
+
+    /// <summary> 簡易ポップアップを非表示にする </summary>
+    public void HideSimplePopup() => _simplePopup.Hide();
 
     /// <summary> 消費登録時の処理 </summary>
     void OnExpenseRegisterClicked(DateTime date, int amount, string note)

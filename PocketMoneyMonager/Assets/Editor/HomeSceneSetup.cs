@@ -24,17 +24,55 @@ public static class HomeSceneSetup
             return;
         }
 
-        if (EditorSceneManager.GetActiveScene().path != ScenePath)
+        var uiManagerList = Object.FindObjectsOfType<UIManager>(true);
+        if (uiManagerList.Length == 0)
+        {
+            if (EditorSceneManager.GetActiveScene().path != ScenePath)
+            {
+                return;
+            }
+
+            Setup();
+            return;
+        }
+
+        if (Object.FindObjectsOfType<SimplePopupView>(true).Length > 0)
         {
             return;
         }
 
-        if (Object.FindObjectsOfType<UIManager>(true).Length > 0)
+        TryAddSimplePopup();
+    }
+
+    /// <summary> SimplePopupをMainシーンに追加する </summary>
+    [MenuItem("Tools/Add Simple Popup")]
+    public static void TryAddSimplePopup()
+    {
+        var scene = EditorSceneManager.GetActiveScene().path == ScenePath
+            ? EditorSceneManager.GetActiveScene()
+            : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var uiManager = Object.FindObjectOfType<UIManager>(true);
+        if (uiManager == null)
         {
             return;
         }
 
-        Setup();
+        if (Object.FindObjectsOfType<SimplePopupView>(true).Length > 0)
+        {
+            return;
+        }
+
+        var fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontAssetPath);
+        var canvas = Object.FindObjectOfType<Canvas>();
+        var simplePopup = CreateSimplePopup(canvas.transform, fontAsset);
+
+        var serializedObject = new SerializedObject(uiManager);
+        serializedObject.FindProperty("_simplePopup").objectReferenceValue = simplePopup;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("SimplePopup added to Main scene.");
     }
 
     /// <summary> MainシーンのUIを構築する </summary>
@@ -61,10 +99,11 @@ public static class HomeSceneSetup
         var expensePopup = CreateExpenseInputPopup(canvas.transform, fontAsset);
         var summaryPopup = CreateExpenseSummaryPopup(canvas.transform, fontAsset);
         var historyPopup = CreateHistoryPopup(canvas.transform, fontAsset);
+        var simplePopup = CreateSimplePopup(canvas.transform, fontAsset);
 
         var uiManagerGo = FindOrCreateGameObject("UIManager", canvas.transform);
         var uiManager = GetOrAddComponent<UIManager>(uiManagerGo);
-        SetUIManagerReferences(uiManager, homeView, expensePopup, summaryPopup, historyPopup);
+        SetUIManagerReferences(uiManager, homeView, expensePopup, summaryPopup, historyPopup, simplePopup);
 
         var homePresenterGo = FindOrCreateRootGameObject("HomePresenter");
         var homePresenter = GetOrAddComponent<HomePresenter>(homePresenterGo);
@@ -273,6 +312,27 @@ public static class HomeSceneSetup
 
         SetHistoryPopupReferences(popupView, panel, contentRoot, itemPrefab, closeButton);
         itemPrefabGo.SetActive(false);
+        panel.SetActive(false);
+        return popupView;
+    }
+
+    /// <summary> 簡易ポップアップを作成する </summary>
+    static SimplePopupView CreateSimplePopup(Transform canvasTransform, TMP_FontAsset fontAsset)
+    {
+        var popupRoot = FindOrCreatePopupRoot(canvasTransform, "SimplePopup");
+        popupRoot.transform.SetAsLastSibling();
+        var popupView = GetOrAddComponent<SimplePopupView>(popupRoot);
+
+        var panel = FindOrCreateChild(popupRoot.transform, "Panel");
+        SetupPopupPanel(panel);
+
+        var messageText = CreatePopupLabel(panel.transform, "MessageText", string.Empty, new Vector2(0f, 80f), 32f, fontAsset, Color.black);
+        var okButton = CreateButton(panel.transform, "OkButton", "OK", new Vector2(-120f, -200f), fontAsset);
+        var cancelButton = CreateButton(panel.transform, "CancelButton", "キャンセル", new Vector2(120f, -200f), fontAsset);
+        var okButtonText = okButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        var cancelButtonText = cancelButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+
+        SetSimplePopupReferences(popupView, panel, messageText, okButton, okButtonText, cancelButton, cancelButtonText);
         panel.SetActive(false);
         return popupView;
     }
@@ -512,13 +572,14 @@ public static class HomeSceneSetup
     }
 
     /// <summary> UIManagerの参照を設定する </summary>
-    static void SetUIManagerReferences(UIManager uiManager, HomeView homeView, ExpenseInputPopupView expensePopup, ExpenseSummaryPopupView summaryPopup, HistoryPopupView historyPopup)
+    static void SetUIManagerReferences(UIManager uiManager, HomeView homeView, ExpenseInputPopupView expensePopup, ExpenseSummaryPopupView summaryPopup, HistoryPopupView historyPopup, SimplePopupView simplePopup)
     {
         var serializedObject = new SerializedObject(uiManager);
         serializedObject.FindProperty("_homeView").objectReferenceValue = homeView;
         serializedObject.FindProperty("_expenseInputPopup").objectReferenceValue = expensePopup;
         serializedObject.FindProperty("_expenseSummaryPopup").objectReferenceValue = summaryPopup;
         serializedObject.FindProperty("_historyPopup").objectReferenceValue = historyPopup;
+        serializedObject.FindProperty("_simplePopup").objectReferenceValue = simplePopup;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
@@ -580,6 +641,19 @@ public static class HomeSceneSetup
         serializedObject.FindProperty("_contentRoot").objectReferenceValue = contentRoot;
         serializedObject.FindProperty("_itemPrefab").objectReferenceValue = itemPrefab;
         serializedObject.FindProperty("_closeButton").objectReferenceValue = closeButton;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary> SimplePopupViewの参照を設定する </summary>
+    static void SetSimplePopupReferences(SimplePopupView popupView, GameObject root, TextMeshProUGUI messageText, Button okButton, TextMeshProUGUI okButtonText, Button cancelButton, TextMeshProUGUI cancelButtonText)
+    {
+        var serializedObject = new SerializedObject(popupView);
+        serializedObject.FindProperty("_root").objectReferenceValue = root;
+        serializedObject.FindProperty("_messageText").objectReferenceValue = messageText;
+        serializedObject.FindProperty("_okButton").objectReferenceValue = okButton;
+        serializedObject.FindProperty("_okButtonText").objectReferenceValue = okButtonText;
+        serializedObject.FindProperty("_cancelButton").objectReferenceValue = cancelButton;
+        serializedObject.FindProperty("_cancelButtonText").objectReferenceValue = cancelButtonText;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
