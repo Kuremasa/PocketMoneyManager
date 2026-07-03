@@ -132,6 +132,7 @@ public class UIManager : MonoBehaviour
 
         RefreshHome();
         HideExpenseInputPopup();
+        ShowSimplePopupOneButton("入力完了しました！", "OK");
     }
 
     /// <summary> 集計タブ切り替え時の処理 </summary>
