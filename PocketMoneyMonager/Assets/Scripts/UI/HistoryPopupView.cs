@@ -11,6 +11,7 @@ public class HistoryPopupView : MonoBehaviour
     [SerializeField] Transform _contentRoot;
     [SerializeField] HistoryItemView _itemPrefab;
     [SerializeField] Button _closeButton;
+    [SerializeField] GameObject _blackCoverObject;
 
     readonly List<HistoryItemView> _activeItems = new List<HistoryItemView>();
 
@@ -24,10 +25,18 @@ public class HistoryPopupView : MonoBehaviour
     void OnDestroy() => _closeButton.onClick.RemoveListener(OnCloseButtonClicked);
 
     /// <summary> ポップアップを表示する </summary>
-    public void Show() => _root.SetActive(true);
+    public void Show()
+    {
+        _blackCoverObject.SetActive(true);
+        _root.SetActive(true);
+    }
 
     /// <summary> ポップアップを非表示にする </summary>
-    public void Hide() => _root.SetActive(false);
+    public void Hide()
+    {
+        _blackCoverObject.SetActive(false);
+        _root.SetActive(false);
+    }
 
     /// <summary> 履歴一覧を表示する </summary>
     public void SetHistory(IReadOnlyList<Transaction> transactions)

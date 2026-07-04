@@ -30,6 +30,7 @@ public class ExpenseSummaryPopupView : MonoBehaviour
     [SerializeField] Sprite _noSelectedTabSprite;
     [SerializeField] TextMeshProUGUI _totalText;
     [SerializeField] Button _closeButton;
+    [SerializeField] GameObject _blackCoverObject;
 
     SummaryTab _currentTab = SummaryTab.Monthly;
 
@@ -58,6 +59,7 @@ public class ExpenseSummaryPopupView : MonoBehaviour
     /// <summary> ポップアップを表示する </summary>
     public void Show()
     {
+        _blackCoverObject.SetActive(true);
         _root.SetActive(true);
         _currentTab = SummaryTab.Monthly;
         UpdateTabVisual();
@@ -65,7 +67,11 @@ public class ExpenseSummaryPopupView : MonoBehaviour
     }
 
     /// <summary> ポップアップを非表示にする </summary>
-    public void Hide() => _root.SetActive(false);
+    public void Hide()
+    {
+        _blackCoverObject.SetActive(false);
+        _root.SetActive(false);
+    }
 
     /// <summary> 合計金額を表示する </summary>
     public void SetTotal(int total) => _totalText.text = $"{CurrencyFormatter.Format(total)}円";

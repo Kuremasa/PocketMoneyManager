@@ -244,6 +244,9 @@ public static class HomeSceneSetup
         var panel = FindOrCreateChild(popupRoot.transform, "Panel");
         SetupPopupPanel(panel);
 
+        var blackCover = FindOrCreateChild(popupRoot.transform, "BlackCover");
+        SetupBlackCover(blackCover);
+
         var dateInput = CreateInputField(panel.transform, "DateInput", "日付 (yyyy-MM-dd)", new Vector2(0f, 120f), fontAsset);
         var amountInput = CreateInputField(panel.transform, "AmountInput", "金額", new Vector2(0f, 0f), fontAsset);
         var noteInput = CreateInputField(panel.transform, "NoteInput", "用途", new Vector2(0f, -120f), fontAsset);
@@ -251,7 +254,8 @@ public static class HomeSceneSetup
         var registerButton = CreateButton(panel.transform, "RegisterButton", "登録", new Vector2(-120f, -320f), fontAsset);
         var cancelButton = CreateButton(panel.transform, "CancelButton", "キャンセル", new Vector2(120f, -320f), fontAsset);
 
-        SetExpenseInputPopupReferences(popupView, panel, dateInput, amountInput, noteInput, errorText, registerButton, cancelButton);
+        SetExpenseInputPopupReferences(popupView, panel, blackCover, dateInput, amountInput, noteInput, errorText, registerButton, cancelButton);
+        blackCover.SetActive(false);
         panel.SetActive(false);
         return popupView;
     }
@@ -264,6 +268,9 @@ public static class HomeSceneSetup
 
         var panel = FindOrCreateChild(popupRoot.transform, "Panel");
         SetupPopupPanel(panel);
+
+        var blackCover = FindOrCreateChild(popupRoot.transform, "BlackCover");
+        SetupBlackCover(blackCover);
 
         var monthlyTabButton = CreateButton(panel.transform, "MonthlyTabButton", "月間", new Vector2(-120f, 120f), fontAsset);
         var weeklyTabButton = CreateButton(panel.transform, "WeeklyTabButton", "週間", new Vector2(120f, 120f), fontAsset);
@@ -278,6 +285,7 @@ public static class HomeSceneSetup
         SetExpenseSummaryPopupReferences(
             popupView,
             panel,
+            blackCover,
             monthlyTabButton,
             weeklyTabButton,
             monthlyTabImage,
@@ -287,6 +295,7 @@ public static class HomeSceneSetup
             selectedTabSprite,
             totalText,
             closeButton);
+        blackCover.SetActive(false);
         panel.SetActive(false);
         return popupView;
     }
@@ -300,6 +309,9 @@ public static class HomeSceneSetup
         var panel = FindOrCreateChild(popupRoot.transform, "Panel");
         SetupPopupPanel(panel);
 
+        var blackCover = FindOrCreateChild(popupRoot.transform, "BlackCover");
+        SetupBlackCover(blackCover);
+
         var scrollGo = FindOrCreateChild(panel.transform, "ScrollView");
         SetupScrollView(scrollGo);
 
@@ -310,8 +322,9 @@ public static class HomeSceneSetup
         var closeButton = CreateButton(panel.transform, "CloseButton", "閉じる", new Vector2(0f, -320f), fontAsset);
         var itemPrefab = itemPrefabGo.GetComponent<HistoryItemView>();
 
-        SetHistoryPopupReferences(popupView, panel, contentRoot, itemPrefab, closeButton);
+        SetHistoryPopupReferences(popupView, panel, blackCover, contentRoot, itemPrefab, closeButton);
         itemPrefabGo.SetActive(false);
+        blackCover.SetActive(false);
         panel.SetActive(false);
         return popupView;
     }
@@ -608,10 +621,11 @@ public static class HomeSceneSetup
     }
 
     /// <summary> ExpenseInputPopupViewの参照を設定する </summary>
-    static void SetExpenseInputPopupReferences(ExpenseInputPopupView popupView, GameObject root, TMP_InputField dateInput, TMP_InputField amountInput, TMP_InputField noteInput, TextMeshProUGUI errorText, Button registerButton, Button cancelButton)
+    static void SetExpenseInputPopupReferences(ExpenseInputPopupView popupView, GameObject root, GameObject blackCover, TMP_InputField dateInput, TMP_InputField amountInput, TMP_InputField noteInput, TextMeshProUGUI errorText, Button registerButton, Button cancelButton)
     {
         var serializedObject = new SerializedObject(popupView);
         serializedObject.FindProperty("_root").objectReferenceValue = root;
+        serializedObject.FindProperty("_blackCoverObject").objectReferenceValue = blackCover;
         serializedObject.FindProperty("_dateInput").objectReferenceValue = dateInput;
         serializedObject.FindProperty("_amountInput").objectReferenceValue = amountInput;
         serializedObject.FindProperty("_noteInput").objectReferenceValue = noteInput;
@@ -625,6 +639,7 @@ public static class HomeSceneSetup
     static void SetExpenseSummaryPopupReferences(
         ExpenseSummaryPopupView popupView,
         GameObject root,
+        GameObject blackCover,
         Button monthlyTabButton,
         Button weeklyTabButton,
         Image monthlyTabImage,
@@ -637,6 +652,7 @@ public static class HomeSceneSetup
     {
         var serializedObject = new SerializedObject(popupView);
         serializedObject.FindProperty("_root").objectReferenceValue = root;
+        serializedObject.FindProperty("_blackCoverObject").objectReferenceValue = blackCover;
         serializedObject.FindProperty("_monthlyTabButton").objectReferenceValue = monthlyTabButton;
         serializedObject.FindProperty("_weeklyTabButton").objectReferenceValue = weeklyTabButton;
         serializedObject.FindProperty("_monthlyTabImage").objectReferenceValue = monthlyTabImage;
@@ -650,10 +666,11 @@ public static class HomeSceneSetup
     }
 
     /// <summary> HistoryPopupViewの参照を設定する </summary>
-    static void SetHistoryPopupReferences(HistoryPopupView popupView, GameObject root, Transform contentRoot, HistoryItemView itemPrefab, Button closeButton)
+    static void SetHistoryPopupReferences(HistoryPopupView popupView, GameObject root, GameObject blackCover, Transform contentRoot, HistoryItemView itemPrefab, Button closeButton)
     {
         var serializedObject = new SerializedObject(popupView);
         serializedObject.FindProperty("_root").objectReferenceValue = root;
+        serializedObject.FindProperty("_blackCoverObject").objectReferenceValue = blackCover;
         serializedObject.FindProperty("_contentRoot").objectReferenceValue = contentRoot;
         serializedObject.FindProperty("_itemPrefab").objectReferenceValue = itemPrefab;
         serializedObject.FindProperty("_closeButton").objectReferenceValue = closeButton;

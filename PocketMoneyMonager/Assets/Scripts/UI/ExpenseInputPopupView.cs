@@ -16,6 +16,7 @@ public class ExpenseInputPopupView : MonoBehaviour
     [SerializeField] TextMeshProUGUI _errorText;
     [SerializeField] Button _registerButton;
     [SerializeField] Button _cancelButton;
+    [SerializeField] GameObject _blackCoverObject;
 
     /// <summary> 登録ボタンクリック時 </summary>
     public event Action<DateTime, int, string> RegisterClicked;
@@ -41,6 +42,7 @@ public class ExpenseInputPopupView : MonoBehaviour
     /// <summary> ポップアップを表示する </summary>
     public void Show()
     {
+        _blackCoverObject.SetActive(true);
         _root.SetActive(true);
         _dateInput.text = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         _amountInput.text = string.Empty;
@@ -49,7 +51,11 @@ public class ExpenseInputPopupView : MonoBehaviour
     }
 
     /// <summary> ポップアップを非表示にする </summary>
-    public void Hide() => _root.SetActive(false);
+    public void Hide()
+    {
+        _blackCoverObject.SetActive(false);
+        _root.SetActive(false);
+    }
 
     /// <summary> エラーメッセージを表示する </summary>
     public void SetErrorMessage(string message) => _errorText.text = message;
