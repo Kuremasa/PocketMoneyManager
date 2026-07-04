@@ -12,6 +12,7 @@ public class SimplePopupView : MonoBehaviour
     [SerializeField] TextMeshProUGUI _okButtonText;
     [SerializeField] Button _cancelButton;
     [SerializeField] TextMeshProUGUI _cancelButtonText;
+    [SerializeField] GameObject _blackCoverObject;
 
     /// <summary> OKボタンクリック時 </summary>
     public event Action OkClicked;
@@ -40,7 +41,7 @@ public class SimplePopupView : MonoBehaviour
         _okButtonText.text = okText;
         _cancelButtonText.text = cancelText;
         _cancelButton.gameObject.SetActive(true);
-        _root.SetActive(true);
+        ShowPopup();
     }
 
     /// <summary> 1ボタンタイプを表示する </summary>
@@ -49,11 +50,22 @@ public class SimplePopupView : MonoBehaviour
         _messageText.text = message;
         _okButtonText.text = okText;
         _cancelButton.gameObject.SetActive(false);
-        _root.SetActive(true);
+        ShowPopup();
     }
 
     /// <summary> ポップアップを非表示にする </summary>
-    public void Hide() => _root.SetActive(false);
+    public void Hide()
+    {
+        _blackCoverObject.SetActive(false);
+        _root.SetActive(false);
+    }
+
+    /// <summary> ポップアップを表示状態にする </summary>
+    void ShowPopup()
+    {
+        _blackCoverObject.SetActive(true);
+        _root.SetActive(true);
+    }
 
     /// <summary> OKボタンクリック時の処理 </summary>
     void OnOkButtonClicked() => OkClicked?.Invoke();

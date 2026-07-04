@@ -2777,6 +2777,7 @@ MonoBehaviour:
   _okButtonText: {fileID: 748496874}
   _cancelButton: {fileID: 1237881785}
   _cancelButtonText: {fileID: 1154685325}
+  _blackCoverObject: {fileID: 677467125}
 --- !u!1 &624503246
 GameObject:
   m_ObjectHideFlags: 0

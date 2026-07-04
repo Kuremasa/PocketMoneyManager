@@ -326,13 +326,17 @@ public static class HomeSceneSetup
         var panel = FindOrCreateChild(popupRoot.transform, "Panel");
         SetupPopupPanel(panel);
 
+        var blackCover = FindOrCreateChild(popupRoot.transform, "BlackCover");
+        SetupBlackCover(blackCover);
+
         var messageText = CreatePopupLabel(panel.transform, "MessageText", string.Empty, new Vector2(0f, 80f), 32f, fontAsset, Color.black);
         var okButton = CreateButton(panel.transform, "OkButton", "OK", new Vector2(-120f, -200f), fontAsset);
         var cancelButton = CreateButton(panel.transform, "CancelButton", "キャンセル", new Vector2(120f, -200f), fontAsset);
         var okButtonText = okButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         var cancelButtonText = cancelButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
 
-        SetSimplePopupReferences(popupView, panel, messageText, okButton, okButtonText, cancelButton, cancelButtonText);
+        SetSimplePopupReferences(popupView, panel, blackCover, messageText, okButton, okButtonText, cancelButton, cancelButtonText);
+        blackCover.SetActive(false);
         panel.SetActive(false);
         return popupView;
     }
@@ -475,6 +479,18 @@ public static class HomeSceneSetup
         panelRect.anchoredPosition = Vector2.zero;
         panelRect.sizeDelta = new Vector2(900f, 900f);
         GetOrAddComponent<Image>(panel).color = new Color(0.95f, 0.95f, 0.95f, 1f);
+    }
+
+    /// <summary> 黒背景カバーをセットアップする </summary>
+    static void SetupBlackCover(GameObject blackCover)
+    {
+        blackCover.transform.SetAsFirstSibling();
+        var blackCoverRect = blackCover.GetComponent<RectTransform>();
+        blackCoverRect.anchorMin = new Vector2(0.5f, 0.5f);
+        blackCoverRect.anchorMax = new Vector2(0.5f, 0.5f);
+        blackCoverRect.anchoredPosition = Vector2.zero;
+        blackCoverRect.sizeDelta = new Vector2(1500f, 2000f);
+        GetOrAddComponent<Image>(blackCover).color = new Color(0f, 0f, 0f, 0.78431374f);
     }
 
     /// <summary> ポップアップRootを取得または作成する </summary>
@@ -645,10 +661,11 @@ public static class HomeSceneSetup
     }
 
     /// <summary> SimplePopupViewの参照を設定する </summary>
-    static void SetSimplePopupReferences(SimplePopupView popupView, GameObject root, TextMeshProUGUI messageText, Button okButton, TextMeshProUGUI okButtonText, Button cancelButton, TextMeshProUGUI cancelButtonText)
+    static void SetSimplePopupReferences(SimplePopupView popupView, GameObject root, GameObject blackCover, TextMeshProUGUI messageText, Button okButton, TextMeshProUGUI okButtonText, Button cancelButton, TextMeshProUGUI cancelButtonText)
     {
         var serializedObject = new SerializedObject(popupView);
         serializedObject.FindProperty("_root").objectReferenceValue = root;
+        serializedObject.FindProperty("_blackCoverObject").objectReferenceValue = blackCover;
         serializedObject.FindProperty("_messageText").objectReferenceValue = messageText;
         serializedObject.FindProperty("_okButton").objectReferenceValue = okButton;
         serializedObject.FindProperty("_okButtonText").objectReferenceValue = okButtonText;
