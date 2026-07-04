@@ -279,6 +279,7 @@ public static class HomeSceneSetup
         var monthlyTabText = monthlyTabButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         var weeklyTabText = weeklyTabButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         var selectedTabSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SelectedTabSpritePath);
+        var periodText = CreatePopupLabel(panel.transform, "PeriodText", string.Empty, new Vector2(0f, 60f), 28f, fontAsset, Color.black);
         var totalText = CreatePopupLabel(panel.transform, "TotalText", "0円", new Vector2(0f, 0f), 48f, fontAsset, Color.black);
         var closeButton = CreateButton(panel.transform, "CloseButton", "閉じる", new Vector2(0f, -200f), fontAsset);
 
@@ -293,6 +294,7 @@ public static class HomeSceneSetup
             monthlyTabText,
             weeklyTabText,
             selectedTabSprite,
+            periodText,
             totalText,
             closeButton);
         blackCover.SetActive(false);
@@ -647,6 +649,7 @@ public static class HomeSceneSetup
         TextMeshProUGUI monthlyTabText,
         TextMeshProUGUI weeklyTabText,
         Sprite selectedTabSprite,
+        TextMeshProUGUI periodText,
         TextMeshProUGUI totalText,
         Button closeButton)
     {
@@ -660,6 +663,7 @@ public static class HomeSceneSetup
         serializedObject.FindProperty("_monthlyTabText").objectReferenceValue = monthlyTabText;
         serializedObject.FindProperty("_weeklyTabText").objectReferenceValue = weeklyTabText;
         serializedObject.FindProperty("_selectedTabSprite").objectReferenceValue = selectedTabSprite;
+        serializedObject.FindProperty("_periodText").objectReferenceValue = periodText;
         serializedObject.FindProperty("_totalText").objectReferenceValue = totalText;
         serializedObject.FindProperty("_closeButton").objectReferenceValue = closeButton;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();

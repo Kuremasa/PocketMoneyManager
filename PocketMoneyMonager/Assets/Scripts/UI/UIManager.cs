@@ -139,10 +139,17 @@ public class UIManager : MonoBehaviour
     void OnSummaryTabChanged(ExpenseSummaryPopupView.SummaryTab tab)
     {
         var referenceDate = DateTime.Now;
-        var total = tab == ExpenseSummaryPopupView.SummaryTab.Monthly
-            ? DataManager.Instance.GetMonthlyTotal(referenceDate)
-            : DataManager.Instance.GetWeeklyTotal(referenceDate);
-        _expenseSummaryPopup.SetTotal(total);
+        if (tab == ExpenseSummaryPopupView.SummaryTab.Monthly)
+        {
+            var range = ExpenseAggregator.GetMonthlyDateRange(referenceDate);
+            _expenseSummaryPopup.SetPeriodRange(range.Start, range.End);
+            _expenseSummaryPopup.SetTotal(DataManager.Instance.GetMonthlyTotal(referenceDate));
+            return;
+        }
+
+        var weeklyRange = ExpenseAggregator.GetWeeklyDateRange(referenceDate);
+        _expenseSummaryPopup.SetPeriodRange(weeklyRange.Start, weeklyRange.End);
+        _expenseSummaryPopup.SetTotal(DataManager.Instance.GetWeeklyTotal(referenceDate));
     }
 
     /// <summary> コンフィグボタンクリック時の処理 </summary>

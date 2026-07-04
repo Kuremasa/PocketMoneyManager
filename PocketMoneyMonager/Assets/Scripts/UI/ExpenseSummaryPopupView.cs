@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,6 +29,7 @@ public class ExpenseSummaryPopupView : MonoBehaviour
     [SerializeField] TextMeshProUGUI _weeklyTabText;
     [SerializeField] Sprite _selectedTabSprite;
     [SerializeField] Sprite _noSelectedTabSprite;
+    [SerializeField] TextMeshProUGUI _periodText;
     [SerializeField] TextMeshProUGUI _totalText;
     [SerializeField] Button _closeButton;
     [SerializeField] GameObject _blackCoverObject;
@@ -71,6 +73,15 @@ public class ExpenseSummaryPopupView : MonoBehaviour
     {
         _blackCoverObject.SetActive(false);
         _root.SetActive(false);
+    }
+
+    /// <summary> 集計対象期間を表示する </summary>
+    public void SetPeriodRange(DateTime start, DateTime end)
+    {
+        var format = "yyyy-MM-dd";
+        var startText = start.ToString(format, CultureInfo.InvariantCulture);
+        var endText = end.ToString(format, CultureInfo.InvariantCulture);
+        _periodText.text = $"{startText} 〜 {endText}";
     }
 
     /// <summary> 合計金額を表示する </summary>
