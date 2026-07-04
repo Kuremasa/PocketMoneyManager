@@ -34,7 +34,7 @@ public class HistoryPopupView : MonoBehaviour
     {
         ClearItems();
 
-        var sortedTransactions = transactions.OrderByDescending(transaction => transaction.Date).ToList();
+        var sortedTransactions = transactions.OrderByDescending(transaction => transaction.DateTime).ToList();
         foreach (var transaction in sortedTransactions)
         {
             var itemView = Instantiate(_itemPrefab, _contentRoot);

@@ -100,8 +100,10 @@ public sealed class DataManager
         }
 
         var trimmedNote = TrimNote(note);
+        var now = DateTime.Now;
+        var transactionDateTime = new DateTime(date.Year, date.Month, date.Day, now.Hour, now.Minute, 0);
         _saveData.balance -= amount;
-        _transactions.Add(Transaction.Create(date, amount, trimmedNote));
+        _transactions.Add(Transaction.Create(transactionDateTime, amount, trimmedNote));
         Save();
         return true;
     }
