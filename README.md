@@ -38,7 +38,7 @@ PocketMoneyManager/          # リポジトリルート
    - **Player Settings → Publishing Settings → Compression Format** は **Disabled**
 2. ビルド成果物を `docs/` にコピー（`index.html`, `Build/`, `TemplateData/`）
 3. 変更を commit & push
-4. GitHub リポジトリの **Settings → Pages** で **Branch: main / Folder: /docs** を設定
+4. GitHub リポジトリの **Settings → Pages** で **Branch: develop / Folder: /docs** を設定
 
 ## ライセンス
 
