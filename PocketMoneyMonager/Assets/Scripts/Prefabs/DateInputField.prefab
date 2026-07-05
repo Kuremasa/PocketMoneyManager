@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 7348468740702751281}
   - component: {fileID: 3636697219768990174}
   - component: {fileID: 5635928184222903015}
+  - component: {fileID: 1397862170413202401}
   m_Layer: 0
   m_Name: DateInputField
   m_TagString: Untagged
@@ -309,6 +310,20 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &1397862170413202401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353487183857718215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4cad6603b1c4465fbc57b43e6f72fe9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inputField: {fileID: 5635928184222903015}
+  _dialogTitle: "\u65E5\u4ED8 (yyyy-MM-dd)"
 --- !u!1 &4630102204580860359
 GameObject:
   m_ObjectHideFlags: 0

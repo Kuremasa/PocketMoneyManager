@@ -456,6 +456,13 @@ public static class HomeSceneSetup
         inputField.textViewport = textAreaRect;
         inputField.textComponent = text;
         inputField.placeholder = placeholderText;
+
+        var bridge = inputGo.AddComponent<WebGLNativeTmpInputField>();
+        var serializedBridge = new SerializedObject(bridge);
+        serializedBridge.FindProperty("_inputField").objectReferenceValue = inputField;
+        serializedBridge.FindProperty("_dialogTitle").stringValue = placeholder;
+        serializedBridge.ApplyModifiedPropertiesWithoutUndo();
+
         return inputField;
     }
 

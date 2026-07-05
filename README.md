@@ -46,3 +46,7 @@ PocketMoneyManager/          # リポジトリルート
 
 - [Liberation Sans](https://github.com/liberationfonts/liberation-fonts) (SIL Open Font License)
 - [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP) (SIL Open Font License)
+
+サードパーティ:
+
+- [WebGLNativeInputField](https://github.com/unity3d-jp/WebGLNativeInputField) (MIT License) — WebGL モバイル向けテキスト入力
