@@ -59,9 +59,9 @@
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/PocketMoneyManager.loader.js";
       var config = {
-        dataUrl: buildUrl + "/PocketMoneyManager.data",
-        frameworkUrl: buildUrl + "/PocketMoneyManager.framework.js",
-        codeUrl: buildUrl + "/PocketMoneyManager.wasm",
+        dataUrl: buildUrl + "/PocketMoneyManager.data.br",
+        frameworkUrl: buildUrl + "/PocketMoneyManager.framework.js.br",
+        codeUrl: buildUrl + "/PocketMoneyManager.wasm.br",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "BijumasaSoft",
         productName: "PocketMoneyManager",
@@ -76,8 +76,10 @@
       // the canvas DOM size and WebGL render target sizes yourself.
       // config.matchWebGLToCanvasSize = false;
 
-      // ブラウザ再訪問時もセーブデータを保持する
-      config.autoSyncPersistentDataPath = true;
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
       // This autosyncing is currently not the default behavior to avoid regressing
       // existing user projects that might rely on the earlier manual
       // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
