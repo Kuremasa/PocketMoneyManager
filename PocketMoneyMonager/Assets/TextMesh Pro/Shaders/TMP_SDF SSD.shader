@@ -132,7 +132,7 @@ SubShader {
             float4	position        : POSITION;
             float3	normal          : NORMAL;
             float4	color           : COLOR;
-            float2	texcoord0       : TEXCOORD0;
+            float4	texcoord0       : TEXCOORD0;
             float2	texcoord1       : TEXCOORD1;
         };
 
@@ -171,7 +171,7 @@ SubShader {
             UNITY_TRANSFER_INSTANCE_ID(input,output);
             UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-            float bold = step(input.texcoord1.y, 0);
+            float bold = step(input.texcoord0.w, 0);
 
             float4 vert = input.position;
             vert.x += _VertexOffsetX;
@@ -206,12 +206,12 @@ SubShader {
 
             output.position = vPosition;
             output.color = color;
-            output.atlas = input.texcoord0;
+            output.atlas = input.texcoord0.xy;
             output.weight = weight;
             output.mask = half2(vert.xy * 2 - clampedRect.xy - clampedRect.zw);
             output.viewDir = mul((float3x3)_EnvMatrix, _WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, vert).xyz);
         #if (UNDERLAY_ON || UNDERLAY_INNER)
-            output.texcoord2 = input.texcoord0 + bOffset;
+            output.texcoord2 = input.texcoord0.xy + bOffset;
             output.underlayColor = underlayColor;
         #endif
             output.textures = float4(faceUV, outlineUV);

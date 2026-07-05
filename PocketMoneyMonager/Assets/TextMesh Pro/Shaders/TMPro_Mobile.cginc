@@ -3,7 +3,7 @@
     float4	position		: POSITION;
     float3	normal			: NORMAL;
     float4	color			: COLOR;
-    float2	texcoord0		: TEXCOORD0;
+    float4	texcoord0		: TEXCOORD0;
     float2	texcoord1		: TEXCOORD1;
 };
 
@@ -35,7 +35,7 @@ pixel_t VertShader(vertex_t input)
     UNITY_TRANSFER_INSTANCE_ID(input, output);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-    float bold = step(input.texcoord1.y, 0);
+    float bold = step(input.texcoord0.w, 0);
 
     float4 vert = input.position;
     vert.x += _VertexOffsetX;
@@ -86,7 +86,7 @@ pixel_t VertShader(vertex_t input)
     float x = -(_UnderlayOffsetX * _ScaleRatioC) * _GradientScale / _TextureWidth;
     float y = -(_UnderlayOffsetY * _ScaleRatioC) * _GradientScale / _TextureHeight;
 
-    output.texcoord2 = float4(input.texcoord0 + float2(x, y), input.color.a, 0);
+    output.texcoord2 = float4(input.texcoord0.xy + float2(x, y), input.color.a, 0);
     output.underlayColor = underlayColor;
     #endif
 

@@ -103,7 +103,7 @@ SubShader {
 			float4	vertex			: POSITION;
 			float3	normal			: NORMAL;
 			fixed4	color			: COLOR;
-			float2	texcoord0		: TEXCOORD0;
+			float4	texcoord0		: TEXCOORD0;
 			float2	texcoord1		: TEXCOORD1;
 		};
 
@@ -127,7 +127,7 @@ SubShader {
 
 		pixel_t VertShader(vertex_t input)
 		{
-			float bold = step(input.texcoord1.y, 0);
+			float bold = step(input.texcoord0.w, 0);
 
 			float4 vert = input.vertex;
 			vert.x += _VertexOffsetX;
@@ -138,7 +138,7 @@ SubShader {
 			pixelSize /= float2(_ScaleX, _ScaleY) * abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
 
 			float scale = rsqrt(dot(pixelSize, pixelSize));
-			scale *= abs(input.texcoord1.y) * _GradientScale * (_Sharpness + 1);
+			scale *= abs(input.texcoord0.w) * _GradientScale * (_Sharpness + 1);
 			if(UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
 
 			float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
@@ -182,11 +182,11 @@ SubShader {
 				vPosition,
 				faceColor,
 				outlineColor,
-				float4(input.texcoord0.x, input.texcoord0.y, maskUV.x, maskUV.y),
+				float4(input.texcoord0.xy, maskUV.x, maskUV.y),
 				half4(scale, bias - outline, bias + outline, bias),
 				half4(vert.xy * 2 - clampedRect.xy - clampedRect.zw, 0.25 / (0.25 * half2(_MaskSoftnessX, _MaskSoftnessY) + pixelSize.xy)),
 			#if (UNDERLAY_ON | UNDERLAY_INNER)
-				float4(input.texcoord0 + layerOffset, input.color.a, 0),
+				float4(input.texcoord0.xy + layerOffset, input.color.a, 0),
 				half2(layerScale, layerBias),
 			#endif
 			};
