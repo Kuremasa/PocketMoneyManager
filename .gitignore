@@ -5,12 +5,16 @@
 
 # Text files
 *.txt
+!**/LiberationSans*.txt
+!**/EmojiOne Attribution.txt
 
 # Unity generated
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
+!docs/Build/
+!docs/Build/**
 [Bb]uilds/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
