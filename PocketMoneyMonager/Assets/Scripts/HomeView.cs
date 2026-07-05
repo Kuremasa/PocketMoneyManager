@@ -11,6 +11,7 @@ public class HomeView : MonoBehaviour
     [SerializeField] Button _summaryButton;
     [SerializeField] Button _historyButton;
     [SerializeField] Button _configButton;
+    [SerializeField] TextMeshProUGUI _versionText;
 
     /// <summary> 消費ボタンクリック時 </summary>
     public event Action ExpenseButtonClicked;
@@ -31,6 +32,7 @@ public class HomeView : MonoBehaviour
     /// <summary> 初期化処理 </summary>
     void Start()
     {
+        _versionText.text = Application.version;
         _expenseButton.onClick.AddListener(OnExpenseButtonClicked);
         _summaryButton.onClick.AddListener(OnSummaryButtonClicked);
         _historyButton.onClick.AddListener(OnHistoryButtonClicked);

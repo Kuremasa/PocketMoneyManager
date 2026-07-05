@@ -36,12 +36,12 @@ public static class HomeSceneSetup
             return;
         }
 
-        if (Object.FindObjectsOfType<SimplePopupView>(true).Length > 0)
+        if (Object.FindObjectsOfType<SimplePopupView>(true).Length == 0)
         {
-            return;
+            TryAddSimplePopup();
         }
 
-        TryAddSimplePopup();
+        TryAddVersionText();
     }
 
     /// <summary> SimplePopupをMainシーンに追加する </summary>
@@ -75,6 +75,34 @@ public static class HomeSceneSetup
         Debug.Log("SimplePopup added to Main scene.");
     }
 
+    /// <summary> バージョン表示をMainシーンに追加する </summary>
+    [MenuItem("Tools/Add Version Text")]
+    public static void TryAddVersionText()
+    {
+        var scene = EditorSceneManager.GetActiveScene().path == ScenePath
+            ? EditorSceneManager.GetActiveScene()
+            : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var homeView = Object.FindObjectOfType<HomeView>(true);
+        if (homeView == null)
+        {
+            return;
+        }
+
+        var serializedObject = new SerializedObject(homeView);
+        if (serializedObject.FindProperty("_versionText").objectReferenceValue != null)
+        {
+            return;
+        }
+
+        var fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontAssetPath);
+        var versionText = CreateVersionText(homeView.transform, fontAsset);
+        SetHomeViewVersionReference(homeView, versionText);
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("VersionText added to Main scene.");
+    }
+
     /// <summary> MainシーンのUIを構築する </summary>
     [MenuItem("Tools/Setup Home Scene")]
     public static void Setup()
@@ -93,8 +121,9 @@ public static class HomeSceneSetup
         var summaryButton = CreateButton(homeViewGo.transform, "SummaryButton", "消費累計", new Vector2(0f, -320f), fontAsset);
         var historyButton = CreateButton(homeViewGo.transform, "HistoryButton", "履歴", new Vector2(0f, -440f), fontAsset);
         var configButton = CreateButton(homeViewGo.transform, "ConfigButton", "コンフィグ", new Vector2(0f, -560f), fontAsset);
+        var versionText = CreateVersionText(homeViewGo.transform, fontAsset);
 
-        SetHomeViewReferences(homeView, balanceText, expenseButton, summaryButton, historyButton, configButton);
+        SetHomeViewReferences(homeView, balanceText, expenseButton, summaryButton, historyButton, configButton, versionText);
 
         var expensePopup = CreateExpenseInputPopup(canvas.transform, fontAsset);
         var summaryPopup = CreateExpenseSummaryPopup(canvas.transform, fontAsset);
@@ -198,6 +227,32 @@ public static class HomeSceneSetup
         text.fontSize = 36f;
         text.alignment = TextAlignmentOptions.Center;
         text.text = "今月のおこづかいは残り 0円 です";
+        return text;
+    }
+
+    /// <summary> バージョンテキストを作成する </summary>
+    static TextMeshProUGUI CreateVersionText(Transform parent, TMP_FontAsset fontAsset)
+    {
+        var existing = parent.Find("VersionText");
+        if (existing != null)
+        {
+            return existing.GetComponent<TextMeshProUGUI>();
+        }
+
+        var textGo = new GameObject("VersionText", typeof(RectTransform), typeof(TextMeshProUGUI));
+        var rectTransform = textGo.GetComponent<RectTransform>();
+        rectTransform.SetParent(parent, false);
+        rectTransform.anchorMin = new Vector2(0.5f, 0f);
+        rectTransform.anchorMax = new Vector2(0.5f, 0f);
+        rectTransform.anchoredPosition = new Vector2(0f, 40f);
+        rectTransform.sizeDelta = new Vector2(400f, 40f);
+
+        var text = textGo.GetComponent<TextMeshProUGUI>();
+        text.font = fontAsset;
+        text.fontSize = 24f;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+        text.text = Application.version;
         return text;
     }
 
@@ -598,7 +653,7 @@ public static class HomeSceneSetup
     }
 
     /// <summary> HomeViewの参照を設定する </summary>
-    static void SetHomeViewReferences(HomeView homeView, TextMeshProUGUI balanceText, Button expenseButton, Button summaryButton, Button historyButton, Button configButton)
+    static void SetHomeViewReferences(HomeView homeView, TextMeshProUGUI balanceText, Button expenseButton, Button summaryButton, Button historyButton, Button configButton, TextMeshProUGUI versionText)
     {
         var serializedObject = new SerializedObject(homeView);
         serializedObject.FindProperty("_balanceText").objectReferenceValue = balanceText;
@@ -606,6 +661,15 @@ public static class HomeSceneSetup
         serializedObject.FindProperty("_summaryButton").objectReferenceValue = summaryButton;
         serializedObject.FindProperty("_historyButton").objectReferenceValue = historyButton;
         serializedObject.FindProperty("_configButton").objectReferenceValue = configButton;
+        serializedObject.FindProperty("_versionText").objectReferenceValue = versionText;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary> HomeViewのバージョン表示参照を設定する </summary>
+    static void SetHomeViewVersionReference(HomeView homeView, TextMeshProUGUI versionText)
+    {
+        var serializedObject = new SerializedObject(homeView);
+        serializedObject.FindProperty("_versionText").objectReferenceValue = versionText;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
