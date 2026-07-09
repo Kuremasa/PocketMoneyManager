@@ -53,6 +53,7 @@ public sealed class DataManager
         _saveData.transactions = _transactions.ToArray();
         var json = JsonUtility.ToJson(_saveData, true);
         File.WriteAllText(GetSavePath(), json);
+        WebGLFileSystemSync.SyncPush();
     }
 
     /// <summary> 毎月1日分のお小遣い付与を判定して適用する </summary>

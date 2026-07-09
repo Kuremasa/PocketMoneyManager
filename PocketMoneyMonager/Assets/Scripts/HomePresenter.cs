@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary> ホーム画面Presenter </summary>
@@ -7,6 +8,23 @@ public class HomePresenter : MonoBehaviour
 
     /// <summary> 初期化処理 </summary>
     void Awake()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        StartCoroutine(InitializeAsync());
+#else
+        InitializeCore();
+#endif
+    }
+
+    /// <summary> IndexedDB同期後に画面を初期化する </summary>
+    IEnumerator InitializeAsync()
+    {
+        yield return WebGLFileSystemSync.WaitForPullCompleted();
+        InitializeCore();
+    }
+
+    /// <summary> セーブデータ読み込み後に画面を初期化する </summary>
+    void InitializeCore()
     {
         DataManager.Instance.Load();
         DataManager.Instance.TryApplyMonthlyAllowance();
