@@ -8949,6 +8949,22 @@ PrefabInstance:
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
       objectReference: {fileID: 0}
+    - target: {fileID: 5635928184222903015, guid: a466894b0a723474db8b3f0e6994a8b9, type: 3}
+      propertyPath: m_CaretWidth
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5635928184222903015, guid: a466894b0a723474db8b3f0e6994a8b9, type: 3}
+      propertyPath: m_HideMobileInput
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5635928184222903015, guid: a466894b0a723474db8b3f0e6994a8b9, type: 3}
+      propertyPath: m_OnFocusSelectAll
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5635928184222903015, guid: a466894b0a723474db8b3f0e6994a8b9, type: 3}
+      propertyPath: m_ResetOnDeActivation
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7813823941304134575, guid: a466894b0a723474db8b3f0e6994a8b9, type: 3}
       propertyPath: m_RaycastTarget
       value: 0
