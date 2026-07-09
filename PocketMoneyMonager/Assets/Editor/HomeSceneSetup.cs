@@ -42,6 +42,7 @@ public static class HomeSceneSetup
         }
 
         TryAddVersionText();
+        TryAddHistoryItemButton();
     }
 
     /// <summary> SimplePopupをMainシーンに追加する </summary>
@@ -101,6 +102,50 @@ public static class HomeSceneSetup
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Debug.Log("VersionText added to Main scene.");
+    }
+
+    /// <summary> HistoryItemPrefabをボタン化する </summary>
+    [MenuItem("Tools/Add History Item Button")]
+    public static void TryAddHistoryItemButton()
+    {
+        var scene = EditorSceneManager.GetActiveScene().path == ScenePath
+            ? EditorSceneManager.GetActiveScene()
+            : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var itemViewList = Object.FindObjectsOfType<HistoryItemView>(true);
+        if (itemViewList.Length == 0)
+        {
+            return;
+        }
+
+        var sceneChanged = false;
+        foreach (var itemView in itemViewList)
+        {
+            var serializedObject = new SerializedObject(itemView);
+            if (serializedObject.FindProperty("_itemButton").objectReferenceValue != null)
+            {
+                continue;
+            }
+
+            var itemButton = GetOrAddComponent<Button>(itemView.gameObject);
+            var itemImage = GetOrAddComponent<Image>(itemView.gameObject);
+            itemButton.targetGraphic = itemImage;
+            DisableRaycastOnChildTexts(itemView.transform);
+
+            var dateText = itemView.transform.Find("DateText")?.GetComponent<TextMeshProUGUI>();
+            var amountText = itemView.transform.Find("AmountText")?.GetComponent<TextMeshProUGUI>();
+            var noteText = itemView.transform.Find("NoteText")?.GetComponent<TextMeshProUGUI>();
+            SetHistoryItemReferences(itemView, itemButton, dateText, amountText, noteText);
+            sceneChanged = true;
+        }
+
+        if (!sceneChanged)
+        {
+            return;
+        }
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("HistoryItemButton added to Main scene.");
     }
 
     /// <summary> MainシーンのUIを構築する </summary>
@@ -457,11 +502,24 @@ public static class HomeSceneSetup
         GetOrAddComponent<Image>(itemGo).color = new Color(1f, 1f, 1f, 0.5f);
 
         var itemView = GetOrAddComponent<HistoryItemView>(itemGo);
+        var itemButton = GetOrAddComponent<Button>(itemGo);
+        var itemImage = GetOrAddComponent<Image>(itemGo);
+        itemButton.targetGraphic = itemImage;
         var dateText = CreatePopupLabel(itemGo.transform, "DateText", "2026-01-01", new Vector2(-250f, 0f), 24f, fontAsset, Color.black);
         var amountText = CreatePopupLabel(itemGo.transform, "AmountText", "0円", new Vector2(0f, 0f), 24f, fontAsset, Color.black);
         var noteText = CreatePopupLabel(itemGo.transform, "NoteText", "用途", new Vector2(250f, 0f), 24f, fontAsset, Color.black);
+        DisableRaycastOnChildTexts(itemGo.transform);
 
-        SetHistoryItemReferences(itemView, dateText, amountText, noteText);
+        SetHistoryItemReferences(itemView, itemButton, dateText, amountText, noteText);
+    }
+
+    /// <summary> 子テキストのRaycastTargetを無効化する </summary>
+    static void DisableRaycastOnChildTexts(Transform parent)
+    {
+        foreach (var text in parent.GetComponentsInChildren<TextMeshProUGUI>(true))
+        {
+            text.raycastTarget = false;
+        }
     }
 
     /// <summary> InputFieldを作成する </summary>
@@ -767,10 +825,11 @@ public static class HomeSceneSetup
     }
 
     /// <summary> HistoryItemViewの参照を設定する </summary>
-    static void SetHistoryItemReferences(HistoryItemView itemView, TextMeshProUGUI dateText, TextMeshProUGUI amountText, TextMeshProUGUI noteText)
+    static void SetHistoryItemReferences(HistoryItemView itemView, Button itemButton, TextMeshProUGUI dateText, TextMeshProUGUI amountText, TextMeshProUGUI noteText)
     {
         var serializedObject = new SerializedObject(itemView);
-        serializedObject.FindProperty("_dateText").objectReferenceValue = dateText;
+        serializedObject.FindProperty("_itemButton").objectReferenceValue = itemButton;
+        serializedObject.FindProperty("_dateTimeText").objectReferenceValue = dateText;
         serializedObject.FindProperty("_amountText").objectReferenceValue = amountText;
         serializedObject.FindProperty("_noteText").objectReferenceValue = noteText;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();

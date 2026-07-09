@@ -92,6 +92,25 @@ public sealed class DataManager
         }
     }
 
+    /// <summary> 消費履歴を削除する </summary>
+    public bool DeleteTransaction(Transaction transaction)
+    {
+        var index = _transactions.FindIndex(item =>
+            item.date == transaction.date &&
+            item.time == transaction.time &&
+            item.amount == transaction.amount &&
+            item.note == transaction.note);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        _saveData.balance += transaction.amount;
+        _transactions.RemoveAt(index);
+        Save();
+        return true;
+    }
+
     /// <summary> 消費を登録する </summary>
     public bool RegisterExpense(DateTime date, int amount, string note)
     {

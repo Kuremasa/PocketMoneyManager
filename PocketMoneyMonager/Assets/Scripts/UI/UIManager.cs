@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
         _expenseSummaryPopup.TabChanged += OnSummaryTabChanged;
         _expenseSummaryPopup.CloseClicked += HideExpenseSummaryPopup;
         _historyPopup.CloseClicked += HideHistoryPopup;
+        _historyPopup.ItemClicked += OnHistoryItemClicked;
     }
 
     /// <summary> 破棄時の処理 </summary>
@@ -33,6 +34,7 @@ public class UIManager : MonoBehaviour
         _expenseSummaryPopup.TabChanged -= OnSummaryTabChanged;
         _expenseSummaryPopup.CloseClicked -= HideExpenseSummaryPopup;
         _historyPopup.CloseClicked -= HideHistoryPopup;
+        _historyPopup.ItemClicked -= OnHistoryItemClicked;
     }
 
     /// <summary> ホーム画面のボタンイベントを登録する </summary>
@@ -154,4 +156,21 @@ public class UIManager : MonoBehaviour
 
     /// <summary> コンフィグボタンクリック時の処理 </summary>
     void OnConfigButtonClicked() => ConfigButtonClicked?.Invoke();
+
+    /// <summary> 履歴アイテムクリック時の処理 </summary>
+    void OnHistoryItemClicked(Transaction transaction)
+    {
+        var message = $"この履歴を削除しますか？\n{transaction.DisplayText}\n{CurrencyFormatter.Format(transaction.amount)}円\n{transaction.note}";
+        ShowSimplePopupTwoButton(message, "削除する", "キャンセル", confirmed =>
+        {
+            if (!confirmed)
+            {
+                return;
+            }
+
+            DataManager.Instance.DeleteTransaction(transaction);
+            RefreshHome();
+            _historyPopup.SetHistory(DataManager.Instance.Transactions);
+        });
+    }
 }

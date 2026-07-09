@@ -18,6 +18,9 @@ public class HistoryPopupView : MonoBehaviour
     /// <summary> 閉じるボタンクリック時 </summary>
     public event Action CloseClicked;
 
+    /// <summary> 履歴アイテムクリック時 </summary>
+    public event Action<Transaction> ItemClicked;
+
     /// <summary> 初期化処理 </summary>
     void Awake() => _closeButton.onClick.AddListener(OnCloseButtonClicked);
 
@@ -49,6 +52,7 @@ public class HistoryPopupView : MonoBehaviour
             var itemView = Instantiate(_itemPrefab, _contentRoot);
             itemView.gameObject.SetActive(true);
             itemView.SetData(transaction);
+            itemView.ItemClicked += OnItemClicked;
             _activeItems.Add(itemView);
         }
     }
@@ -56,11 +60,15 @@ public class HistoryPopupView : MonoBehaviour
     /// <summary> 閉じるボタンクリック時の処理 </summary>
     void OnCloseButtonClicked() => CloseClicked?.Invoke();
 
+    /// <summary> 履歴アイテムクリック時の処理 </summary>
+    void OnItemClicked(Transaction transaction) => ItemClicked?.Invoke(transaction);
+
     /// <summary> 表示中の履歴アイテムをクリアする </summary>
     void ClearItems()
     {
         foreach (var itemView in _activeItems)
         {
+            itemView.ItemClicked -= OnItemClicked;
             Destroy(itemView.gameObject);
         }
 
