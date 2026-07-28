@@ -128,6 +128,36 @@ public sealed class DataManager
         return true;
     }
 
+    /// <summary> 消費履歴を修正する </summary>
+    public bool UpdateTransaction(Transaction original, DateTime date, int amount, string note)
+    {
+        if (amount <= 0)
+        {
+            return false;
+        }
+
+        var index = _transactions.FindIndex(item =>
+            item.date == original.date &&
+            item.time == original.time &&
+            item.amount == original.amount &&
+            item.note == original.note);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        _saveData.balance += original.amount - amount;
+        _transactions[index] = new Transaction
+        {
+            date = date.ToString(DateFormat, CultureInfo.InvariantCulture),
+            time = original.time,
+            amount = amount,
+            note = TrimNote(note)
+        };
+        Save();
+        return true;
+    }
+
     /// <summary> 今月の消費合計を取得する </summary>
     public int GetMonthlyTotal(DateTime referenceDate) =>
         ExpenseAggregator.CalculateMonthlyTotal(_transactions, referenceDate);

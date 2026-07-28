@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] HistoryPopupView _historyPopup;
     [SerializeField] SimplePopupView _simplePopup;
 
+    Transaction? _editingTransaction;
+
     /// <summary> コンフィグボタンクリック時 </summary>
     public event Action ConfigButtonClicked;
 
@@ -19,6 +21,7 @@ public class UIManager : MonoBehaviour
         _homeView.ConfigButtonClicked += OnConfigButtonClicked;
         _expenseInputPopup.RegisterClicked += OnExpenseRegisterClicked;
         _expenseInputPopup.CancelClicked += HideExpenseInputPopup;
+        _expenseInputPopup.DeleteClicked += OnExpenseDeleteClicked;
         _expenseSummaryPopup.TabChanged += OnSummaryTabChanged;
         _expenseSummaryPopup.CloseClicked += HideExpenseSummaryPopup;
         _historyPopup.CloseClicked += HideHistoryPopup;
@@ -31,6 +34,7 @@ public class UIManager : MonoBehaviour
         _homeView.ConfigButtonClicked -= OnConfigButtonClicked;
         _expenseInputPopup.RegisterClicked -= OnExpenseRegisterClicked;
         _expenseInputPopup.CancelClicked -= HideExpenseInputPopup;
+        _expenseInputPopup.DeleteClicked -= OnExpenseDeleteClicked;
         _expenseSummaryPopup.TabChanged -= OnSummaryTabChanged;
         _expenseSummaryPopup.CloseClicked -= HideExpenseSummaryPopup;
         _historyPopup.CloseClicked -= HideHistoryPopup;
@@ -57,10 +61,25 @@ public class UIManager : MonoBehaviour
     public void RefreshHome() => _homeView.SetBalance(DataManager.Instance.Balance);
 
     /// <summary> 消費入力ポップアップを表示する </summary>
-    public void ShowExpenseInputPopup() => _expenseInputPopup.Show();
+    public void ShowExpenseInputPopup()
+    {
+        _editingTransaction = null;
+        _expenseInputPopup.Show();
+    }
+
+    /// <summary> 消費入力ポップアップを履歴編集用に表示する </summary>
+    public void ShowExpenseInputPopupForEdit(Transaction transaction)
+    {
+        _editingTransaction = transaction;
+        _expenseInputPopup.ShowForEdit(transaction);
+    }
 
     /// <summary> 消費入力ポップアップを非表示にする </summary>
-    public void HideExpenseInputPopup() => _expenseInputPopup.Hide();
+    public void HideExpenseInputPopup()
+    {
+        _editingTransaction = null;
+        _expenseInputPopup.Hide();
+    }
 
     /// <summary> 消費累計ポップアップを表示する </summary>
     public void ShowExpenseSummaryPopup() => _expenseSummaryPopup.Show();
@@ -126,6 +145,21 @@ public class UIManager : MonoBehaviour
     /// <summary> 消費登録時の処理 </summary>
     void OnExpenseRegisterClicked(DateTime date, int amount, string note)
     {
+        if (_editingTransaction.HasValue)
+        {
+            if (!DataManager.Instance.UpdateTransaction(_editingTransaction.Value, date, amount, note))
+            {
+                _expenseInputPopup.SetErrorMessage("金額は1以上の整数で入力してください");
+                return;
+            }
+
+            RefreshHome();
+            RefreshHistoryList();
+            HideExpenseInputPopup();
+            ShowSimplePopupOneButton("修正完了しました！", "OK");
+            return;
+        }
+
         if (!DataManager.Instance.RegisterExpense(date, amount, note))
         {
             _expenseInputPopup.SetErrorMessage("金額は1以上の整数で入力してください");
@@ -135,6 +169,30 @@ public class UIManager : MonoBehaviour
         RefreshHome();
         HideExpenseInputPopup();
         ShowSimplePopupOneButton("入力完了しました！", "OK");
+    }
+
+    /// <summary> 履歴削除ボタンクリック時の処理 </summary>
+    void OnExpenseDeleteClicked()
+    {
+        if (!_editingTransaction.HasValue)
+        {
+            return;
+        }
+
+        var transaction = _editingTransaction.Value;
+        var message = $"この履歴を削除しますか？\n{transaction.DisplayText}\n{CurrencyFormatter.Format(transaction.amount)}円\n{transaction.note}";
+        ShowSimplePopupTwoButton(message, "削除する", "キャンセル", confirmed =>
+        {
+            if (!confirmed)
+            {
+                return;
+            }
+
+            DataManager.Instance.DeleteTransaction(transaction);
+            RefreshHome();
+            RefreshHistoryList();
+            HideExpenseInputPopup();
+        });
     }
 
     /// <summary> 集計タブ切り替え時の処理 </summary>
@@ -158,19 +216,8 @@ public class UIManager : MonoBehaviour
     void OnConfigButtonClicked() => ConfigButtonClicked?.Invoke();
 
     /// <summary> 履歴アイテムクリック時の処理 </summary>
-    void OnHistoryItemClicked(Transaction transaction)
-    {
-        var message = $"この履歴を削除しますか？\n{transaction.DisplayText}\n{CurrencyFormatter.Format(transaction.amount)}円\n{transaction.note}";
-        ShowSimplePopupTwoButton(message, "削除する", "キャンセル", confirmed =>
-        {
-            if (!confirmed)
-            {
-                return;
-            }
+    void OnHistoryItemClicked(Transaction transaction) => ShowExpenseInputPopupForEdit(transaction);
 
-            DataManager.Instance.DeleteTransaction(transaction);
-            RefreshHome();
-            _historyPopup.SetHistory(DataManager.Instance.Transactions);
-        });
-    }
+    /// <summary> 履歴一覧を再描画する </summary>
+    void RefreshHistoryList() => _historyPopup.SetHistory(DataManager.Instance.Transactions);
 }

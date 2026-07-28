@@ -43,6 +43,7 @@ public static class HomeSceneSetup
 
         TryAddVersionText();
         TryAddHistoryItemButton();
+        TryAddExpenseDeleteButton();
     }
 
     /// <summary> SimplePopupをMainシーンに追加する </summary>
@@ -146,6 +147,55 @@ public static class HomeSceneSetup
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Debug.Log("HistoryItemButton added to Main scene.");
+    }
+
+    /// <summary> ExpenseInputPopupに履歴削除ボタンを追加する </summary>
+    [MenuItem("Tools/Add Expense Delete Button")]
+    public static void TryAddExpenseDeleteButton()
+    {
+        var scene = EditorSceneManager.GetActiveScene().path == ScenePath
+            ? EditorSceneManager.GetActiveScene()
+            : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var expensePopup = Object.FindObjectOfType<ExpenseInputPopupView>(true);
+        if (expensePopup == null)
+        {
+            return;
+        }
+
+        var serializedObject = new SerializedObject(expensePopup);
+        var deleteButtonProperty = serializedObject.FindProperty("_deleteButton");
+        var registerButtonTextProperty = serializedObject.FindProperty("_registerButtonText");
+        if (deleteButtonProperty.objectReferenceValue != null && registerButtonTextProperty.objectReferenceValue != null)
+        {
+            return;
+        }
+
+        var fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontAssetPath);
+        var panel = expensePopup.transform.Find("Panel");
+        if (panel == null)
+        {
+            return;
+        }
+
+        var registerButton = serializedObject.FindProperty("_registerButton").objectReferenceValue as Button;
+        var registerButtonText = registerButton != null
+            ? registerButton.transform.Find("Text")?.GetComponent<TextMeshProUGUI>()
+            : null;
+        var deleteButton = CreateButton(panel, "DeleteButton", "履歴削除", new Vector2(0f, -420f), fontAsset);
+        ConfigureExpenseDeleteButton(deleteButton);
+        deleteButton.gameObject.SetActive(false);
+
+        if (registerButtonTextProperty != null)
+        {
+            registerButtonTextProperty.objectReferenceValue = registerButtonText;
+        }
+
+        deleteButtonProperty.objectReferenceValue = deleteButton;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("ExpenseDeleteButton added to Main scene.");
     }
 
     /// <summary> MainシーンのUIを構築する </summary>
@@ -351,10 +401,24 @@ public static class HomeSceneSetup
         var amountInput = CreateInputField(panel.transform, "AmountInput", "金額", new Vector2(0f, 0f), fontAsset);
         var noteInput = CreateInputField(panel.transform, "NoteInput", "用途", new Vector2(0f, -120f), fontAsset);
         var errorText = CreatePopupLabel(panel.transform, "ErrorText", string.Empty, new Vector2(0f, -220f), 24f, fontAsset, Color.red);
-        var registerButton = CreateButton(panel.transform, "RegisterButton", "登録", new Vector2(-120f, -320f), fontAsset);
+        var registerButton = CreateButton(panel.transform, "RegisterButton", "登録する", new Vector2(-120f, -320f), fontAsset);
         var cancelButton = CreateButton(panel.transform, "CancelButton", "キャンセル", new Vector2(120f, -320f), fontAsset);
+        var deleteButton = CreateButton(panel.transform, "DeleteButton", "履歴削除", new Vector2(0f, -420f), fontAsset);
+        deleteButton.gameObject.SetActive(false);
+        var registerButtonText = registerButton.transform.Find("Text").GetComponent<TextMeshProUGUI>();
 
-        SetExpenseInputPopupReferences(popupView, panel, blackCover, dateInput, amountInput, noteInput, errorText, registerButton, cancelButton);
+        SetExpenseInputPopupReferences(
+            popupView,
+            panel,
+            blackCover,
+            dateInput,
+            amountInput,
+            noteInput,
+            errorText,
+            registerButton,
+            registerButtonText,
+            cancelButton,
+            deleteButton);
         blackCover.SetActive(false);
         panel.SetActive(false);
         return popupView;
@@ -752,7 +816,18 @@ public static class HomeSceneSetup
     }
 
     /// <summary> ExpenseInputPopupViewの参照を設定する </summary>
-    static void SetExpenseInputPopupReferences(ExpenseInputPopupView popupView, GameObject root, GameObject blackCover, TMP_InputField dateInput, TMP_InputField amountInput, TMP_InputField noteInput, TextMeshProUGUI errorText, Button registerButton, Button cancelButton)
+    static void SetExpenseInputPopupReferences(
+        ExpenseInputPopupView popupView,
+        GameObject root,
+        GameObject blackCover,
+        TMP_InputField dateInput,
+        TMP_InputField amountInput,
+        TMP_InputField noteInput,
+        TextMeshProUGUI errorText,
+        Button registerButton,
+        TextMeshProUGUI registerButtonText,
+        Button cancelButton,
+        Button deleteButton)
     {
         var serializedObject = new SerializedObject(popupView);
         serializedObject.FindProperty("_root").objectReferenceValue = root;
@@ -762,8 +837,27 @@ public static class HomeSceneSetup
         serializedObject.FindProperty("_noteInput").objectReferenceValue = noteInput;
         serializedObject.FindProperty("_errorText").objectReferenceValue = errorText;
         serializedObject.FindProperty("_registerButton").objectReferenceValue = registerButton;
+        serializedObject.FindProperty("_registerButtonText").objectReferenceValue = registerButtonText;
         serializedObject.FindProperty("_cancelButton").objectReferenceValue = cancelButton;
+        serializedObject.FindProperty("_deleteButton").objectReferenceValue = deleteButton;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary> 履歴削除ボタンの見た目を整える </summary>
+    static void ConfigureExpenseDeleteButton(Button deleteButton)
+    {
+        var rectTransform = deleteButton.GetComponent<RectTransform>();
+        rectTransform.anchorMin = new Vector2(0f, 1f);
+        rectTransform.anchorMax = new Vector2(0f, 1f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform.anchoredPosition = new Vector2(500f, -1240f);
+        rectTransform.sizeDelta = new Vector2(400f, 160f);
+
+        var panelRect = deleteButton.transform.parent as RectTransform;
+        if (panelRect != null && panelRect.sizeDelta.y < 1400f)
+        {
+            panelRect.sizeDelta = new Vector2(panelRect.sizeDelta.x, 1400f);
+        }
     }
 
     /// <summary> ExpenseSummaryPopupViewの参照を設定する </summary>
